@@ -232,3 +232,14 @@ export const HomeStoryMaterial = shaderMaterial(
     }
   `
 );
+
+// Augment TypeScript definitions to allow custom materials in JSX
+import { Object3DNode } from "@react-three/fiber";
+
+declare module "@react-three/fiber" {
+  interface IntrinsicElements {
+    distortionMaterial: any;
+    storyMaterial: any;
+    homeStoryMaterial: any;
+  }
+}
