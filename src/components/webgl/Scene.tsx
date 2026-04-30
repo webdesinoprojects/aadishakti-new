@@ -1,5 +1,6 @@
 "use client";
 
+import type { DistortionMaterialProps, StoryMaterialProps, HomeStoryMaterialProps } from "../../types/custom-materials";
 import { useRef, useState, useMemo } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei";
@@ -10,15 +11,6 @@ import gsap from "gsap";
 
 extend({ DistortionMaterial, StoryMaterial, HomeStoryMaterial });
 
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      distortionMaterial: any;
-      storyMaterial: any;
-      homeStoryMaterial: any;
-    }
-  }
-}
 interface PlaneProps {
   url: string;
   position: [number, number, number];
@@ -74,6 +66,7 @@ const ImagePlane = ({ url, position, holographic = false }: PlaneProps) => {
       onPointerMove={handlePointerMove}
     >
       <planeGeometry args={[16, 9, 64, 64]} />
+      {/* @ts-ignore - React Three Fiber custom material registration */}
       <distortionMaterial 
         ref={materialRef} 
         uTexture={texture} 
@@ -171,6 +164,7 @@ export const Scene = () => {
       <mesh ref={meshRef} position={[0, 0, 0]}>
         {/* Cover the entire viewport */}
         <planeGeometry args={[16, 9, 64, 64]} />
+        {/* @ts-ignore - React Three Fiber custom material registration */}
         <storyMaterial 
           ref={materialRef} 
           uTex1={tex1} 
@@ -213,6 +207,7 @@ export const Scene = () => {
     return (
       <mesh ref={meshRef} position={[0, 0, 0]}>
         <planeGeometry args={[16, 9, 64, 64]} />
+        {/* @ts-ignore - React Three Fiber custom material registration */}
         <homeStoryMaterial 
           ref={materialRef} 
           uTex1={tex1} 
@@ -241,17 +236,26 @@ export const Scene = () => {
         ))
       )}
       
-      <points position={[0, 0, -50]}>
-        <bufferGeometry>
-          <bufferAttribute
-            attach="attributes-position"
-            count={1000}
-            array={new Float32Array(3000).map(() => (Math.random() - 0.5) * 100)}
-            itemSize={3}
-          />
-        </bufferGeometry>
-        <pointsMaterial size={0.1} color="#e5a93d" transparent opacity={0.5} />
-      </points>
+      {useMemo(() => {
+        const positions = new Float32Array(3000);
+        for (let i = 0; i < positions.length; i++) {
+          positions[i] = (Math.random() - 0.5) * 100;
+        }
+        return (
+          <points position={[0, 0, -50]}>
+            <bufferGeometry>
+              <bufferAttribute
+                attach="attributes-position"
+                array={positions}
+                count={1000}
+                itemSize={3}
+                args={[positions, 3]}
+              />
+            </bufferGeometry>
+            <pointsMaterial size={0.1} color="#e5a93d" transparent opacity={0.5} />
+          </points>
+        );
+      }, [])}
     </>
   );
 };
