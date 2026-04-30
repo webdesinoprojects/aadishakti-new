@@ -10,6 +10,15 @@ import gsap from "gsap";
 
 extend({ DistortionMaterial, StoryMaterial, HomeStoryMaterial });
 
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      distortionMaterial: any;
+      storyMaterial: any;
+      homeStoryMaterial: any;
+    }
+  }
+}
 interface PlaneProps {
   url: string;
   position: [number, number, number];
